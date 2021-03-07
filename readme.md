@@ -12,9 +12,12 @@ start the server: `python serve.py`
 
 On the device, edit: `/usr/share/remarkable/update.conf`  
 set the line: `SERVER=http://yourhost:8000`  
-restart the update service: `systemctl stop update_engine`  
-start the update engine: `update_engine -foreground`  
-in a different shell: `update_engine_client -check_for_update`  
+restart the update service: `systemctl restart update-engine`  
+to observe the update: `journalctl -u update-engine -f`  
+
+check/force for a software update:
+in the UI or  
+`update_engine_client -check_for_update`  
 
 ## TODO
 read the version from the filename
