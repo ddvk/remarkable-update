@@ -79,30 +79,10 @@ class MySimpleHTTPRequestHandler(SimpleHTTPRequestHandler):
         print(body)
         xml = ET.fromstring(body)
         event_node = xml.find('app/event')
-
-        event_type = int(event_node.attrib["eventtype"])
-        event_result = int(event_node.attrib["eventresult"])
-
-        #post install status
-        if event_result != 0:
-            print("Update done")
-            error_code = event_node.attrib["errorcode"]
-            if error_code:
-                print("With errorcode:", error_code)
-            return
-
-
-        #update done
-        if event_type == 14:
-            print("OK Response:")
-            print(response_ok)
-            self.send_response(200)
-            self.end_headers()
-            self.wfile.write(response_ok.encode())
-            return
+        updatecheck_node = xml.find('app/updatecheck')
 
         #check for update
-        if event_type == 13 or event_type == 3:
+        if updatecheck_node is not None:
             version = xml.attrib["version"]
             platform = xml.find('os').attrib['platform']
             print("requested: ", version)
@@ -127,6 +107,24 @@ class MySimpleHTTPRequestHandler(SimpleHTTPRequestHandler):
             self.wfile.write(response.encode())
             return
 
+        event_type = int(event_node.attrib["eventtype"])
+        event_result = int(event_node.attrib["eventresult"])
+
+        #post install status
+        if event_result != 0:
+            print("Update done")
+            if "errorcode" in event_node.attrib:
+                print("With errorcode:", event_node.attrib["errorcode"])
+            return
+
+        #update done
+        if event_type == 14:
+            print("OK Response:")
+            print(response_ok)
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(response_ok.encode())
+            return
 
 httpd = HTTPServer(('0.0.0.0', port), MySimpleHTTPRequestHandler)
 print(f"Starting fake updater: {port}")
