@@ -6,7 +6,6 @@ import os, io, socket, hashlib, base64
 import binascii
 
 
-update_version = "2.5.0.27"
 port = 8000
 
 response_ok = """<?xml version='1.0' encoding='UTF-8'?>
@@ -46,13 +45,8 @@ def hostname():
     host = socket.gethostname()
     return f"http://{host}:{port}/"
 
-def getupdateinfo(platform):
-    if platform == "reMarkable2":
-        update_name = "update_rm2"
-    elif platform == "reMarkable":
-        update_name =  "update_rm1"
-    else:
-        raise Exception("unknown platform")
+def getupdateinfo(platform, version):
+    update_name = os.path.join("updates", f"{version}_{platform}.signed")
 
     update_size = str(os.path.getsize(update_name))
 
@@ -72,7 +66,29 @@ def getupdateinfo(platform):
     return (update_name, update_sha1, update_sha256, update_size)
 
 
+def get_update():
+    files = os.listdir('updates')
+    versions={}
+    for f in files:
+        p = f.split('_')
+        if len(p) != 2:
+            continue
+        t = p[1].split('.')
+        if len(t) != 2:
+            continue
+        version = p[0]
+        product = t[0]
+
+        if not product in versions or versions[product] < version:
+            versions[product]=version
+
+    print(versions)
+
+    return versions
+
+v = get_update()
 class MySimpleHTTPRequestHandler(SimpleHTTPRequestHandler):
+
     def do_POST(self):
         length = int(self.headers.get('Content-Length'))
         body = self.rfile.read(length).decode('utf-8')
@@ -86,10 +102,11 @@ class MySimpleHTTPRequestHandler(SimpleHTTPRequestHandler):
         #post install status
         if event_result != 0:
             print("Update done")
-            error_code = event_node.attrib["errorcode"]
-            if error_code:
-                print("With errorcode:", error_code)
-            return
+            if 'errorcode' in event_node.attrib:
+                error_code = event_node.attrib["errorcode"]
+                if error_code:
+                    print("With errorcode:", error_code)
+                return
 
 
         #update done
@@ -108,10 +125,14 @@ class MySimpleHTTPRequestHandler(SimpleHTTPRequestHandler):
             print("requested: ", version)
             print("platform: ", platform)
 
-            update_name, update_sha1, update_sha256, update_size = getupdateinfo(platform)
+            version = v[platform]
+
+
+
+            update_name, update_sha1, update_sha256, update_size = getupdateinfo(platform, version)
             host_name = hostname()
             params = {
-                    "version": update_version,
+                    "version": version,
                     "update_name": update_name,
                     "update_sha1": update_sha1,
                     "update_sha256": update_sha256,
@@ -128,6 +149,10 @@ class MySimpleHTTPRequestHandler(SimpleHTTPRequestHandler):
             return
 
 
-httpd = HTTPServer(('0.0.0.0', port), MySimpleHTTPRequestHandler)
-print(f"Starting fake updater: {port}")
-httpd.serve_forever()
+
+
+if __name__ == "__main__":
+    handler = MySimpleHTTPRequestHandler
+    httpd = HTTPServer(('0.0.0.0', port), handler)
+    print(f"Starting fake updater: {port}")
+    httpd.serve_forever()
