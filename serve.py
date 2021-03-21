@@ -48,14 +48,15 @@ def hostname():
     return url
 
 def getupdateinfo(platform, version, update_name):
+    full_path = os.path.join(updates_folder, update_name)
 
-    update_size = str(os.path.getsize(update_name))
+    update_size = str(os.path.getsize(full_path))
 
     BUF_SIZE = 8192
 
     sha1 = hashlib.sha1()
     sha256 = hashlib.sha256()
-    with open(update_name, 'rb') as f:
+    with open(full_path, 'rb') as f:
         while True:
             data = f.read(BUF_SIZE)
             if not data:
@@ -81,8 +82,7 @@ def scan_updates():
         product = t[0]
 
         if not product in versions or versions[product][0] < version:
-            update_name = os.path.join(updates_folder, f)
-            versions[product]=(version, update_name)
+            versions[product]=(version, f)
 
     return versions
 
@@ -131,7 +131,7 @@ class MySimpleHTTPRequestHandler(SimpleHTTPRequestHandler):
             update_sha1, update_sha256, update_size = getupdateinfo(platform, version, update_name)
             params = {
                     "version": version,
-                    "update_name": update_name,
+                    "update_name": f"{updates_folder}/{update_name}",
                     "update_sha1": update_sha1,
                     "update_sha256": update_sha256,
                     "update_size" : update_size,
