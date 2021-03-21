@@ -7,6 +7,7 @@ import binascii
 
 
 port = 8000
+updates_folder = 'updates'
 
 response_ok = """<?xml version='1.0' encoding='UTF-8'?>
 <response protocol="3.0" server="prod">
@@ -43,10 +44,10 @@ response_template = """<?xml version="1.0" encoding="UTF-8"?>
 
 def hostname():
     host = socket.gethostname()
-    return f"http://{host}:{port}/"
+    url =  f"http://{host}:{port}/"
+    return url
 
-def getupdateinfo(platform, version):
-    update_name = os.path.join("updates", f"{version}_{platform}.signed")
+def getupdateinfo(platform, version, update_name):
 
     update_size = str(os.path.getsize(update_name))
 
@@ -63,11 +64,11 @@ def getupdateinfo(platform, version):
             sha256.update(data)
     update_sha1 = binascii.b2a_base64(sha1.digest(), newline=False).decode()
     update_sha256 = binascii.b2a_base64(sha256.digest(), newline=False).decode()
-    return (update_name, update_sha1, update_sha256, update_size)
+    return (update_sha1, update_sha256, update_size)
 
 
-def get_update():
-    files = os.listdir('updates')
+def scan_updates():
+    files = os.listdir(updates_folder)
     versions={}
     for f in files:
         p = f.split('_')
@@ -79,14 +80,13 @@ def get_update():
         version = p[0]
         product = t[0]
 
-        if not product in versions or versions[product] < version:
-            versions[product]=version
-
-    print(versions)
+        if not product in versions or versions[product][0] < version:
+            update_name = os.path.join(updates_folder, f)
+            versions[product]=(version, update_name)
 
     return versions
 
-v = get_update()
+
 class MySimpleHTTPRequestHandler(SimpleHTTPRequestHandler):
 
     def do_POST(self):
@@ -125,12 +125,10 @@ class MySimpleHTTPRequestHandler(SimpleHTTPRequestHandler):
             print("requested: ", version)
             print("platform: ", platform)
 
-            version = v[platform]
 
+            version, update_name  = available_versions[platform]
 
-
-            update_name, update_sha1, update_sha256, update_size = getupdateinfo(platform, version)
-            host_name = hostname()
+            update_sha1, update_sha256, update_size = getupdateinfo(platform, version, update_name)
             params = {
                     "version": version,
                     "update_name": update_name,
@@ -149,9 +147,13 @@ class MySimpleHTTPRequestHandler(SimpleHTTPRequestHandler):
             return
 
 
-
+available_versions = scan_updates()
+host_name = hostname()
 
 if __name__ == "__main__":
+    print("Device should use: ", host_name)
+    print("Available updates:", available_versions)
+
     handler = MySimpleHTTPRequestHandler
     httpd = HTTPServer(('0.0.0.0', port), handler)
     print(f"Starting fake updater: {port}")
