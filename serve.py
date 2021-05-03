@@ -94,7 +94,6 @@ class MySimpleHTTPRequestHandler(SimpleHTTPRequestHandler):
         body = self.rfile.read(length).decode('utf-8')
         print(body)
         xml = ET.fromstring(body)
-        event_node = xml.find('app/event')
         updatecheck_node = xml.find('app/updatecheck')
 
 
@@ -126,6 +125,7 @@ class MySimpleHTTPRequestHandler(SimpleHTTPRequestHandler):
             self.wfile.write(response.encode())
             return
 
+        event_node = xml.find('app/event')
         event_type = int(event_node.attrib["eventtype"])
         event_result = int(event_node.attrib["eventresult"])
 
