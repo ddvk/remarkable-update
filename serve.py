@@ -6,8 +6,8 @@ import os, io, socket, hashlib, base64
 import binascii
 
 
-update_version = "2.5.0.27"
 port = 8000
+updates_folder = 'updates'
 
 response_ok = """<?xml version='1.0' encoding='UTF-8'?>
 <response protocol="3.0" server="prod">
@@ -44,23 +44,19 @@ response_template = """<?xml version="1.0" encoding="UTF-8"?>
 
 def hostname():
     host = socket.gethostname()
-    return f"http://{host}:{port}/"
+    url =  f"http://{host}:{port}/"
+    return url
 
-def getupdateinfo(platform):
-    if platform == "reMarkable2":
-        update_name = "update_rm2"
-    elif platform == "reMarkable":
-        update_name =  "update_rm1"
-    else:
-        raise Exception("unknown platform")
+def getupdateinfo(platform, version, update_name):
+    full_path = os.path.join(updates_folder, update_name)
 
-    update_size = str(os.path.getsize(update_name))
+    update_size = str(os.path.getsize(full_path))
 
     BUF_SIZE = 8192
 
     sha1 = hashlib.sha1()
     sha256 = hashlib.sha256()
-    with open(update_name, 'rb') as f:
+    with open(full_path, 'rb') as f:
         while True:
             data = f.read(BUF_SIZE)
             if not data:
@@ -69,10 +65,30 @@ def getupdateinfo(platform):
             sha256.update(data)
     update_sha1 = binascii.b2a_base64(sha1.digest(), newline=False).decode()
     update_sha256 = binascii.b2a_base64(sha256.digest(), newline=False).decode()
-    return (update_name, update_sha1, update_sha256, update_size)
+    return (update_sha1, update_sha256, update_size)
+
+
+def scan_updates():
+    files = os.listdir(updates_folder)
+    versions={}
+    for f in files:
+        p = f.split('_')
+        if len(p) != 2:
+            continue
+        t = p[1].split('.')
+        if len(t) != 2:
+            continue
+        version = p[0]
+        product = t[0]
+
+        if not product in versions or versions[product][0] < version:
+            versions[product]=(version, f)
+
+    return versions
 
 
 class MySimpleHTTPRequestHandler(SimpleHTTPRequestHandler):
+
     def do_POST(self):
         length = int(self.headers.get('Content-Length'))
         body = self.rfile.read(length).decode('utf-8')
@@ -81,6 +97,7 @@ class MySimpleHTTPRequestHandler(SimpleHTTPRequestHandler):
         event_node = xml.find('app/event')
         updatecheck_node = xml.find('app/updatecheck')
 
+
         #check for update
         if updatecheck_node is not None:
             version = xml.attrib["version"]
@@ -88,11 +105,13 @@ class MySimpleHTTPRequestHandler(SimpleHTTPRequestHandler):
             print("requested: ", version)
             print("platform: ", platform)
 
-            update_name, update_sha1, update_sha256, update_size = getupdateinfo(platform)
-            host_name = hostname()
+
+            version, update_name  = available_versions[platform]
+
+            update_sha1, update_sha256, update_size = getupdateinfo(platform, version, update_name)
             params = {
-                    "version": update_version,
-                    "update_name": update_name,
+                    "version": version,
+                    "update_name": f"{updates_folder}/{update_name}",
                     "update_sha1": update_sha1,
                     "update_sha256": update_sha256,
                     "update_size" : update_size,
@@ -126,6 +145,14 @@ class MySimpleHTTPRequestHandler(SimpleHTTPRequestHandler):
             self.wfile.write(response_ok.encode())
             return
 
-httpd = HTTPServer(('0.0.0.0', port), MySimpleHTTPRequestHandler)
-print(f"Starting fake updater: {port}")
-httpd.serve_forever()
+available_versions = scan_updates()
+host_name = hostname()
+
+if __name__ == "__main__":
+    print("Device should use: ", host_name)
+    print("Available updates:", available_versions)
+
+    handler = MySimpleHTTPRequestHandler
+    httpd = HTTPServer(('0.0.0.0', port), handler)
+    print(f"Starting fake updater: {port}")
+    httpd.serve_forever()
