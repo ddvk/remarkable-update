@@ -12,7 +12,7 @@ set the line: `SERVER=http://yourhost:8000`
 
 if you disabled the automatic updates, make sure the update-engine is running: `systemctl start update-engine`
 
-trigger the udpate: `update_engine_client -check_for_update`  
+trigger the update: `update_engine_client -check_for_update`  
 or via the UI (check for update)
 
 to observe the update progress: `journalctl -u update-engine -f`  
