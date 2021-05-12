@@ -8,11 +8,14 @@ start the server: `python serve.py`
 on the device:
 
 edit: `/usr/share/remarkable/update.conf`  
- set the line: `SERVER=http://yourhost:8000`  
- trigger the udpate: `update_engine_client -check_for_update`  
- or via the UI (check for update)
+set the line: `SERVER=http://yourhost:8000`  
 
-to observe the update: `journalctl -u update-engine -f`  
+if you disabled the automatic updates, make sure the update-engine is running: `systemctl start update-engine`
+
+trigger the udpate: `update_engine_client -check_for_update`  
+or via the UI (check for update)
+
+to observe the update progress: `journalctl -u update-engine -f`  
 
 
 ## To switch the partition
