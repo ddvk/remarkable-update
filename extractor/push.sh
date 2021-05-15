@@ -1,7 +1,8 @@
 #!/bin/sh
 set -e
 IMAGE=$1
-DEVICE=rm
+DEVICE=root@10.11.99.1
+
 CURRENT=$(ssh $DEVICE "mount -v | grep  'on / ' | cut -f1 -d ' '")
 OLD_PART="${CURRENT: -1}"
 
