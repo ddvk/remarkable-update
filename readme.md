@@ -1,7 +1,10 @@
 # Simple Factory Reset (updater)
 
 ## Usage
-get an official update e.g. [2.5.0.27](https://eu-central-1.linodeobjects.com:443/remarkable-2/build/reMarkable%20Device%20Beta/RM110/2.5.0.27/2.5.0.27_reMarkable2.signed), drop it in:
+get an official update e.g.   
+[rm2 2.7.0.51](https://eu-central-1.linodeobjects.com:443/remarkable-2/build/reMarkable%20Device%20Beta/RM110/2.7.0.51/2.7.0.51_reMarkable2.signed)  
+[rm1 2.7.0.51](https://eu-central-1.linodeobjects.com:443/remarkable-2/build/reMarkable%20Device%20Beta/RM110/2.7.0.51/2.7.0.51_reMarkable.signed)  
+drop it in:
 `updates/`
 start the server: `python serve.py`  
 
