@@ -2,7 +2,7 @@
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 import http.server
 import xml.etree.ElementTree as ET
-import os, io, socket, hashlib, base64
+import os,sys, io, socket, hashlib, base64
 import binascii
 
 
@@ -42,8 +42,7 @@ response_template = """<?xml version="1.0" encoding="UTF-8"?>
 </response>
 """
 
-def hostname():
-    host = socket.gethostname()
+def hostname(host):
     url =  f"http://{host}:{port}/"
     return url
 
@@ -146,9 +145,16 @@ class MySimpleHTTPRequestHandler(SimpleHTTPRequestHandler):
             return
 
 available_versions = scan_updates()
-host_name = hostname()
+host_name = None 
 
 if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        host = sys.argv[1]
+    else:
+        print("Using hostname, to override use: ./serve.py hostname")
+        host = socket.gethostname()
+    host_name = hostname(host)
+        
     print("Device should use: ", host_name)
     print("Available updates:", available_versions)
 

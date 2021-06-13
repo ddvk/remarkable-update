@@ -10,6 +10,8 @@ drop it in:
 on your host, start the server: `python serve.py`  
 the server will use the machine's hostname, so that should be resolvable from the tablet
 
+you may use the usb interface for the update, just find the ip address that was assigned to it and run the server e.g.  `python server.py 10.11.99.2'
+
 on the device:
 
 edit: `/usr/share/remarkable/update.conf`  
@@ -27,4 +29,7 @@ to observe the update progress: `journalctl -u update-engine -f`
 
 ## To switch the partition i.e. boot the previous version
 use the `switch.sh` script on the device
+
+## Beta
+It seems that the update server address (SERVER) is defined in the `/home/root/.config/xochitl.conf` file [Issue](https://github.com/ddvk/remarkable-update/issues/7)
 
