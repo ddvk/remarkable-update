@@ -17,7 +17,7 @@ on the device:
 edit: `/usr/share/remarkable/update.conf`  
 set the line: `SERVER=http://yourhost:8000`  
 make sure you can ping/resolve `yourhost` from the device. 
-if your dns sucks, add the entry to `/etc/hosts`, you may even use the usb interface ip address
+if your dns sucks, add the entry to `/etc/hosts`, you may even use the usb interface ip address (10.11.99.2).
 
 if you disabled the automatic updates, make sure the update-engine is running: `systemctl start update-engine`
 
