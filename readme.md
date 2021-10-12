@@ -7,7 +7,7 @@ get an official update e.g.
 [rm1 2.7.0.51](https://eu-central-1.linodeobjects.com:443/remarkable-2/build/reMarkable%20Device%20Beta/RM110/2.7.0.51/2.7.0.51_reMarkable.signed)  
 drop it in:
 `updates/`
-on your host, start the server: `python serve.py`  
+on your host, start the server: `python serve.py` (This assumes you are using python 3)
 the server will use the machine's hostname, so that should be resolvable from the tablet
 
 you may use the usb interface for the update, just find the ip address that was assigned to it and run the server e.g.  `python server.py 10.11.99.2'
