@@ -3,8 +3,8 @@ A hackish, quick and dirty update server implementation
 
 ## Usage
 get an official update e.g.   
-[rm2 2.7.0.51](https://eu-central-1.linodeobjects.com:443/remarkable-2/build/reMarkable%20Device%20Beta/RM110/2.7.0.51/2.7.0.51_reMarkable2.signed)  
-[rm1 2.7.0.51](https://eu-central-1.linodeobjects.com:443/remarkable-2/build/reMarkable%20Device%20Beta/RM110/2.7.0.51/2.7.0.51_reMarkable.signed)  
+[rm1 2.10.2.356](https://updates-download.cloud.remarkable.engineering:443/build/reMarkable%20Device%20Beta/RM110/2.10.2.356/2.10.2.356_reMarkable-Lp90j3g4at-.signed)  
+[rm2 2.10.2.356](https://updates-download.cloud.remarkable.engineering:443/build/reMarkable%20Device%20Beta/RM110/2.10.2.356/2.10.2.356_reMarkable2-JLB6Ax3hnJ-.signed)  
 drop it in:
 `updates/`
 on your host, start the server: `python serve.py` (This assumes you are using python 3)
