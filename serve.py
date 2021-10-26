@@ -77,8 +77,12 @@ def scan_updates():
         t = p[1].split('.')
         if len(t) != 2:
             continue
+
+        z = t[0].split('-')
+
         version = p[0]
-        product = t[0]
+        print(version)
+        product = z[0]
 
         if not product in versions or versions[product][0] < version:
             versions[product]=(version, f)
