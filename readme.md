@@ -10,7 +10,7 @@ drop it in:
 on your host, start the server: `python serve.py` (This assumes you are using python 3)
 the server will use the machine's hostname, so that should be resolvable from the tablet
 
-you may use the usb interface for the update, just find the ip address that was assigned to it and run the server e.g.  `python server.py 10.11.99.2`
+you may use the usb interface for the update, just find the ip address that was assigned to it and run the server e.g.  `python serve.py 10.11.99.2`
 
 on the device:
 
