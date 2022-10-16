@@ -1,35 +1,93 @@
 # Simple Factory Reset (updater)
+
 A hackish, quick and dirty update server implementation
 
 ## Usage
-get an official update e.g.   
-[rm1 2.10.2.356](https://updates-download.cloud.remarkable.engineering:443/build/reMarkable%20Device%20Beta/RM110/2.10.2.356/2.10.2.356_reMarkable-Lp90j3g4at-.signed)  
-[rm2 2.10.2.356](https://updates-download.cloud.remarkable.engineering:443/build/reMarkable%20Device%20Beta/RM110/2.10.2.356/2.10.2.356_reMarkable2-JLB6Ax3hnJ-.signed)  
-drop it in:
-`updates/`
-on your host, start the server: `python serve.py` (This assumes you are using python 3)
-the server will use the machine's hostname, so that should be resolvable from the tablet
 
-you may use the usb interface for the update, just find the ip address that was assigned to it and run the server e.g.  `python serve.py 10.11.99.2`
+1. Clone this Repo
 
-on the device:
+1. Obtain an official release that you would like to upgrade (er, downgrade) to. A [list of firmware releases can be found here](https://thelastzombie.github.io/remarkable-firmware/).
 
-edit: `/usr/share/remarkable/update.conf`  
-set the line: `SERVER=http://yourhost:8000`  
-make sure you can ping/resolve `yourhost` from the device. 
-if your dns sucks, add the entry to `/etc/hosts`, you may even use the usb interface ip address (10.11.99.2).
+1. Put your firmware release in `./updates`.
 
-if you disabled the automatic updates, make sure the update-engine is running: `systemctl start update-engine`
+1. Figure out the hostname of the computer you are connecting your remarkable to. If you are connecting to USB it will likely be `10.11.99.2`. If your ReMarkable device is connected to your local wifi, it may also work to use a local IP address such as `192.168.1.25`. The docs will use `10.11.99.2` as the hostname. If you have a different hostname, adjust accordingly.
 
-trigger the update: `update_engine_client -check_for_update`  
-or via the UI (check for update)
+1. Start the mock upgrade server. (This assumes you are running python3)
 
-to observe the update progress: `journalctl -u update-engine -f`  
+   ```shell
+   python serve.py 10.11.99.2
+   ```
 
+1. SSH into your ReMarkable device and edit `/usr/share/remarkeable/update.conf`:
+
+   ```shell
+   ssh root@10.11.99.1
+   vim /etc/share/remarkable/update.cof
+   ```
+
+1. Add the following line to the `update.conf` file:
+
+   ```text
+   SERVER=http://10.11.99.2:8000
+   ```
+
+1. Run an automatic update.
+
+### Via ReMarkable UI
+
+1. Go to Menu -> Settings -> General: click on the Software Version.
+
+1. Tap Check for Updates. It should download and install the update.
+
+1. Once it is complete, it should prompt you to tap to reboot your device.
+
+### Via the CLI
+
+1. In the ReMarkable Terminal, make sure `update-engine` is running:
+
+   ```shell
+   systemctl start update-engine
+   ```
+
+1. Trigger the update:
+
+   ```shell
+   update_engine_client -check_for_update
+   ```
+
+1. Observe the update progess.
+
+   ```shell
+   journalctl -u update-engine -f
+   ```
+
+1. Once it is complete, reboot the device.
+
+   ```shell
+   reboot
+   ```
 
 ## To switch the partition i.e. boot the previous version
-use the `switch.sh` script on the device
+
+1. Copy the `switch.sh` script to the device.
+
+   ```shell
+   scp switch.sh root@10.11.99.1:~
+   ```
+
+1. SSH into reMarkable and run the script.
+
+   ```shell
+   ssh root@10.11.99.1
+   ./switch.sh
+   ```
+
+1. Reboot the device for changes to take effect.
+
+   ```shell
+   reboot
+   ```
 
 ## Beta
-It seems that the update server address (SERVER) is defined in the `/home/root/.config/xochitl.conf` file [Issue](https://github.com/ddvk/remarkable-update/issues/7)
 
+It seems that the update server address (SERVER) is defined in the `/home/root/.config/xochitl.conf` file [Issue](https://github.com/ddvk/remarkable-update/issues/7)
