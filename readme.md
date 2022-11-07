@@ -22,7 +22,7 @@ A hackish, quick and dirty update server implementation
 
    ```shell
    ssh root@10.11.99.1
-   vim /etc/share/remarkable/update.cof
+   vim /usr/share/remarkeable/update.conf
    ```
 
 1. Add the following line to the `update.conf` file:
