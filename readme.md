@@ -18,11 +18,11 @@ A hackish, quick and dirty update server implementation
    python serve.py 10.11.99.2
    ```
 
-1. SSH into your ReMarkable device and edit `/usr/share/remarkeable/update.conf`:
+1. SSH into your ReMarkable device and edit `/usr/share/remarkable/update.conf`:
 
    ```shell
    ssh root@10.11.99.1
-   vim /usr/share/remarkeable/update.conf
+   nano /usr/share/remarkable/update.conf
    ```
 
 1. Add the following line to the `update.conf` file:
