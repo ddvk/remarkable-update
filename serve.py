@@ -162,6 +162,9 @@ if __name__ == "__main__":
     print("Device should use: ", host_name)
     print("Available updates:", available_versions)
 
+    if not available_versions:
+        raise FileNotFoundError("Could not find any update files")
+
     handler = MySimpleHTTPRequestHandler
     httpd = HTTPServer(('0.0.0.0', port), handler)
     print(f"Starting fake updater: {port}")
