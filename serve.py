@@ -72,6 +72,8 @@ def scan_updates():
     versions={}
     for f in files:
         p = f.split('_')
+        if(p[0].startswith('rm')):
+            p.pop(0)
         if len(p) != 2:
             continue
         t = p[1].split('.')
