@@ -6,7 +6,7 @@ A hackish, quick and dirty update server implementation
 
 1. Clone this Repo
 
-1. Obtain an official release that you would like to upgrade (er, downgrade) to. A [list of firmware releases can be found here](https://thelastzombie.github.io/remarkable-firmware/).
+1. Obtain an official release that you would like to upgrade (er, downgrade) to. A [list of firmware releases can be found here](https://archive.org/download/rm110/RM110/).
 
 1. Put your firmware release in `./updates`.
 
