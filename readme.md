@@ -1,6 +1,8 @@
+_**Note:** This only works for OS versions before 3.11 as 3.11 changes the upgrade mechanism that the device uses._
+
 # Simple Factory Reset (updater)
 
-A hackish, quick and dirty update server implementation
+A hackish, quick and dirty update server implementation. For a more complete solution, check out [codexctl](https://github.com/Jayy001/codexctl).
 
 ## Usage
 
